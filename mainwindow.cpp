@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->showTimeIntervalHorizontalSlider, SIGNAL(valueChanged(int)),
     ui->showTimeIntervalSpinBox, SLOT(setValue(int)));
 
-  setWindowTitle(irs::str_conv<QString>(wstring(L"Покров    ")) +
+  setWindowTitle(irs::str_conv<QString>(wstring(L"Покров ПЭМИН ")) +
     irs::str_conv<QString>(std::string(VERSION_STR)));
 
   irs::loc();
@@ -114,6 +114,12 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->label->setVisible(false);
   ui->linePowerLevelSpinBox->setVisible(false);
   ui->linePowerLevelHorizontalSlider->setVisible(false);
+  ui->showPowerIntervalLabel->setVisible(false);
+  ui->showPowerIntervalSpinBox->setVisible(false);
+  ui->showPowerIntervalHorizontalSlider->setVisible(false);
+  ui->showTimeIntervalLabel->setVisible(false);
+  ui->showTimeIntervalSpinBox->setVisible(false);
+  ui->showTimeIntervalHorizontalSlider->setVisible(false);
 }
 
 MainWindow::~MainWindow()

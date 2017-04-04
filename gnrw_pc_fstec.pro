@@ -10,13 +10,13 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-VERSION = 0.1.3.5
+VERSION = 1.3
 VERSTR = '\\"$${VERSION}\\"'
 DEFINES += VERSION_STR=\"$${VERSTR}\"
 
 QMAKE_TARGET_COMPANY = ООО \"\"РЭС\"\"
-QMAKE_TARGET_PRODUCT = Покров
-QMAKE_TARGET_DESCRIPTION = Покров
+QMAKE_TARGET_PRODUCT = Покров ПЭМИН
+QMAKE_TARGET_DESCRIPTION = Покров ПЭМИН
 QMAKE_TARGET_COPYRIGHT = ООО \"\"РЭС\"\"
 
 RC_ICONS = irs.ico

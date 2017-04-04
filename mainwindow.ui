@@ -377,24 +377,7 @@
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="5" column="0">
-          <widget class="QLabel" name="showTimeIntervalLabel">
-           <property name="text">
-            <string>Время отображения времени работы, с</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QSpinBox" name="showPowerIntervalSpinBox">
-           <property name="buttonSymbols">
-            <enum>QAbstractSpinBox::NoButtons</enum>
-           </property>
-           <property name="maximum">
-            <number>255</number>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <widget class="QSpinBox" name="showTimeIntervalSpinBox">
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::NoButtons</enum>
@@ -404,14 +387,24 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="showPowerIntervalLabel">
            <property name="text">
             <string>Время отображения мощности, с</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="2">
+         <item row="5" column="1">
+          <widget class="QSpinBox" name="showPowerIntervalSpinBox">
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::NoButtons</enum>
+           </property>
+           <property name="maximum">
+            <number>255</number>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="2">
           <widget class="QSlider" name="showTimeIntervalHorizontalSlider">
            <property name="maximum">
             <number>255</number>
@@ -433,7 +426,14 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="2">
+         <item row="6" column="0">
+          <widget class="QLabel" name="showTimeIntervalLabel">
+           <property name="text">
+            <string>Время отображения времени работы, с</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
           <widget class="QSlider" name="linePowerLevelHorizontalSlider">
            <property name="minimumSize">
             <size>
@@ -458,21 +458,14 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
+         <item row="1" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Уровень шума поля</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Уровень шума сети питания</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
+         <item row="1" column="1">
           <widget class="QSpinBox" name="etherPowerLevelSpinBox">
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::NoButtons</enum>
@@ -482,17 +475,33 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="linePowerLevelSpinBox">
-           <property name="buttonSymbols">
-            <enum>QAbstractSpinBox::NoButtons</enum>
-           </property>
-           <property name="maximum">
-            <number>9</number>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Уровень шума сети питания</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="2">
+         <item row="3" column="2">
+          <widget class="QSlider" name="volumeHorizontalSlider">
+           <property name="maximum">
+            <number>5</number>
+           </property>
+           <property name="pageStep">
+            <number>1</number>
+           </property>
+           <property name="tracking">
+            <bool>false</bool>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="tickPosition">
+            <enum>QSlider::TicksAbove</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="2">
           <widget class="QSlider" name="showPowerIntervalHorizontalSlider">
            <property name="maximum">
             <number>255</number>
@@ -514,14 +523,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Громкость</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QSpinBox" name="volumeSpinBox">
            <property name="buttonSymbols">
             <enum>QAbstractSpinBox::NoButtons</enum>
@@ -531,26 +533,14 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="2">
-          <widget class="QSlider" name="volumeHorizontalSlider">
-           <property name="maximum">
-            <number>5</number>
-           </property>
-           <property name="pageStep">
-            <number>1</number>
-           </property>
-           <property name="tracking">
-            <bool>false</bool>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="tickPosition">
-            <enum>QSlider::TicksAbove</enum>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Громкость</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
+         <item row="1" column="2">
           <widget class="QSlider" name="etherPowerLevelHorizontalSlider">
            <property name="minimumSize">
             <size>
@@ -578,24 +568,24 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="2" column="1">
+          <widget class="QSpinBox" name="linePowerLevelSpinBox">
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::NoButtons</enum>
+           </property>
+           <property name="maximum">
+            <number>9</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
           <widget class="QLabel" name="label_6">
            <property name="text">
             <string>Яркость</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QSpinBox" name="brightnessSpinBox">
-           <property name="buttonSymbols">
-            <enum>QAbstractSpinBox::NoButtons</enum>
-           </property>
-           <property name="maximum">
-            <number>5</number>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="2">
+         <item row="4" column="2">
           <widget class="QSlider" name="brightnessHorizontalSlider">
            <property name="maximum">
             <number>5</number>
@@ -613,6 +603,59 @@
             <enum>QSlider::TicksAbove</enum>
            </property>
           </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QSpinBox" name="brightnessSpinBox">
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::NoButtons</enum>
+           </property>
+           <property name="maximum">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="3">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QPushButton" name="onPushButton">
+             <property name="text">
+              <string>Включить</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="offPushButton">
+             <property name="text">
+              <string>Выключить</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_10">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>

@@ -108,6 +108,12 @@ MainWindow::MainWindow(QWidget *parent) :
   //ui->statusIconLabel->setMovie(mp_movie);
   // Скрываем режим "Максимальная мощность"
   ui->boostCheckBox->setVisible(false);
+  ui->label_2->setVisible(false);
+  ui->etherPowerLevelSpinBox->setVisible(false);
+  ui->etherPowerLevelHorizontalSlider->setVisible(false);
+  ui->label->setVisible(false);
+  ui->linePowerLevelSpinBox->setVisible(false);
+  ui->linePowerLevelHorizontalSlider->setVisible(false);
 }
 
 MainWindow::~MainWindow()

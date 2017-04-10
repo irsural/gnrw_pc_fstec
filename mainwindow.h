@@ -51,6 +51,10 @@ private slots:
 
   void on_boostCheckBox_clicked(bool checked);
 
+  void on_onPushButton_clicked();
+
+  void on_offPushButton_clicked();
+
 private:
   QString timeToStr(double a_t, bool a_show_seconds = false);
   void updateStatus(bool a_force = false);

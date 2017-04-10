@@ -97,6 +97,8 @@ public:
   void set_show_power_interval(size_t a_time);
   size_t get_show_time_interva() const;
   void set_show_time_interval(size_t a_time);
+  void on(bool a_on);
+  bool on();
 
   bool ip_change_success_check();
   //generator_status_t get_status();
@@ -141,11 +143,25 @@ private:
 
     irs::conn_data_t<irs_u8> bright;
   };
+
+  static const size_t m_power_max = 9;
+
   irs::mxdata_t* mp_data;
   network_variables_t m_network_variables;
   irs::timer_t m_sync_timer;
   irs::timer_t m_apply_ip_timer;
   irs::timer_t m_wait_apply_ip_timer;
+  size_t m_power_index;
+  irs::timer_t m_wait_power_change_timer;
+  size_t m_ether_power_on;
+  size_t m_line_power_on;
+  vector<irs_u32> m_ether_power_time_list;
+  vector<irs_u32> m_line_power_time_list;
+  bool m_is_on_power_finded;
+  bool m_is_on_power_find_perform;
+
+  void on_power_find_start();
+  void on_power_find_tick();
 };
 
 class gnrw_link_t: public irs::mxdata_assembly_t

@@ -1,3 +1,9 @@
+#include <algorithm>
+
+#include <irsstring.h>
+
+#include <QMessageBox>
+
 #include "gnrw.h"
 
 #include <irsfinal.h>
@@ -8,7 +14,15 @@ gnrw_t::gnrw_t():
   m_network_variables(),
   m_sync_timer(irs::make_cnt_s(2)),
   m_apply_ip_timer(irs::make_cnt_s(2)),
-  m_wait_apply_ip_timer(irs::make_cnt_s(2))
+  m_wait_apply_ip_timer(irs::make_cnt_s(2)),
+  m_power_index(1),
+  m_wait_power_change_timer(irs::make_cnt_ms(500)),
+  m_ether_power_on(m_power_max),
+  m_line_power_on(m_power_max),
+  m_ether_power_time_list(),
+  m_line_power_time_list(),
+  m_is_on_power_finded(false),
+  m_is_on_power_find_perform(false)
 {
 }
 
@@ -284,6 +298,32 @@ void gnrw_t::set_show_time_interval(size_t a_time)
   m_sync_timer.start();
 }
 
+void gnrw_t::on(bool a_on)
+{
+  if (!connected()) {
+    return;
+  }
+  if (a_on) {
+    if (m_is_on_power_finded) {
+      m_network_variables.ether_power = m_ether_power_on;
+      m_network_variables.line_power = m_line_power_on;
+    } else {
+      on_power_find_start();
+    }
+  } else {
+    m_network_variables.ether_power = 0;
+    m_network_variables.line_power = 0;
+  }
+}
+
+bool gnrw_t::on()
+{
+  if (!connected()) {
+    return false;
+  }
+  return (get_ether_power() > 0) || (get_line_power() > 0);
+}
+
 bool gnrw_t::ip_change_success_check()
 {
   return m_wait_apply_ip_timer.check();
@@ -291,12 +331,12 @@ bool gnrw_t::ip_change_success_check()
 
 void gnrw_t::reset()
 {
-  m_network_variables.boost_bit = 1;
-  m_network_variables.ether_power = 9;
-  m_network_variables.line_power = 9;
+  //m_network_variables.boost_bit = 1;
+  //m_network_variables.ether_power = 9;
+  //m_network_variables.line_power = 9;
   m_network_variables.volume = 1;
-  m_network_variables.show_power_interval = 1;
-  m_network_variables.show_time_interval = 5;
+  //m_network_variables.show_power_interval = 1;
+  //m_network_variables.show_time_interval = 5;
   m_network_variables.bright = 2;
 
   m_sync_timer.start();
@@ -308,8 +348,79 @@ bool gnrw_t::synchronizes()
   return !m_sync_timer.stopped();
 }
 
+void gnrw_t::on_power_find_start()
+{
+  m_is_on_power_find_perform = true;
+  m_power_index = 1;
+  m_ether_power_time_list.clear();
+  //m_ether_power_time_list.push_back(0);
+  m_line_power_time_list.clear();
+  //m_line_power_time_list.push_back(0);
+}
+
+void gnrw_t::on_power_find_tick()
+{
+  if (!connected()) {
+    m_is_on_power_finded = false;
+  }
+  if (m_is_on_power_find_perform) {
+    if ((m_power_index == 1) || (m_wait_power_change_timer.check())) {
+      if (m_power_index > 1) {
+        m_ether_power_time_list.push_back(
+          m_network_variables.ether_work_time_for_current_level);
+        m_line_power_time_list.push_back(
+          m_network_variables.line_work_time_for_current_level);
+      }
+      if (m_power_index <= m_power_max) {
+        set_ether_power(m_power_index);
+        set_line_power(m_power_index);
+        m_power_index++;
+        m_wait_power_change_timer.start();
+      } else {
+        typedef vector<irs_u32>::reverse_iterator it_t;
+        it_t ether_it = max_element(m_ether_power_time_list.rbegin(),
+          m_ether_power_time_list.rend());
+        m_ether_power_on = m_ether_power_time_list.rend() - ether_it;
+        it_t line_it = max_element(m_line_power_time_list.rbegin(),
+          m_line_power_time_list.rend());
+        m_line_power_on = m_line_power_time_list.rend() - line_it;
+        m_network_variables.ether_power = m_ether_power_on;
+        m_network_variables.line_power = m_line_power_on;
+        m_is_on_power_finded = true;
+
+#ifdef NOP
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(irs::str_conv<QString>(std::wstring(L"Покров")));
+        QString text;
+        text += irs::str_conv<QString>(std::wstring(L"Поле: "));
+        for (size_t i = 0; i < m_ether_power_time_list.size(); i++) {
+          text += irs::irsstr_from_number_current(char(),
+            m_ether_power_time_list[i]*0.1).c_str();
+          text += " ";
+        }
+        text += "\n";
+        text += irs::str_conv<QString>(std::wstring(L"Сеть: "));
+        for (size_t i = 0; i < m_line_power_time_list.size(); i++) {
+          text += irs::irsstr_from_number_current(char(),
+            m_line_power_time_list[i]*0.1).c_str();
+          text += " ";
+        }
+        text += "\n";
+        msgBox.setText(text);
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.exec();
+#endif //NOP
+      }
+    }
+  }
+}
+
 void gnrw_t::tick()
 {
+  on_power_find_tick();
+
   if (m_apply_ip_timer.check()) {
     if (connected()) {
       m_network_variables.apply_ip_mask_bit = 1;

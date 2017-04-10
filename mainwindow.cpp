@@ -132,6 +132,18 @@ void MainWindow::tick()
   m_gnrw_link.tick();
   m_gnrw.tick();
 
+  static bool gnrw_connected_prev = false;
+  if (m_gnrw.connected() != gnrw_connected_prev) {
+    if (m_gnrw.on()) {
+      ui->onPushButton->setChecked(true);
+      ui->offPushButton->setChecked(false);
+    } else {
+      ui->onPushButton->setChecked(false);
+      ui->offPushButton->setChecked(true);
+    }
+  }
+  gnrw_connected_prev = m_gnrw.connected();
+
   if (m_update_timer.check()) {
     updateStatus();
 
@@ -556,4 +568,18 @@ void MainWindow::on_brightnessSpinBox_valueChanged(int arg1)
 void MainWindow::on_boostCheckBox_clicked(bool checked)
 {
   m_gnrw.set_boost(checked);
+}
+
+void MainWindow::on_onPushButton_clicked()
+{
+  m_gnrw.on(true);
+  ui->onPushButton->setChecked(true);
+  ui->offPushButton->setChecked(false);
+}
+
+void MainWindow::on_offPushButton_clicked()
+{
+  m_gnrw.on(false);
+  ui->onPushButton->setChecked(false);
+  ui->offPushButton->setChecked(true);
 }

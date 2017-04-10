@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>841</width>
-    <height>684</height>
+    <height>707</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -484,6 +484,9 @@
          </item>
          <item row="3" column="2">
           <widget class="QSlider" name="volumeHorizontalSlider">
+           <property name="minimum">
+            <number>1</number>
+           </property>
            <property name="maximum">
             <number>5</number>
            </property>
@@ -587,6 +590,9 @@
          </item>
          <item row="4" column="2">
           <widget class="QSlider" name="brightnessHorizontalSlider">
+           <property name="minimum">
+            <number>1</number>
+           </property>
            <property name="maximum">
             <number>5</number>
            </property>

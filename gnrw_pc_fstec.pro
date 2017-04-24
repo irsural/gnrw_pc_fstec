@@ -10,14 +10,29 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-VERSION = 1.4
+VERSION = 1.5
 VERSTR = '\\"$${VERSION}\\"'
 DEFINES += VERSION_STR=\"$${VERSTR}\"
 
+DEFINES += GNRWPC_FSB
+
+!contains(DEFINES, GNRWPC_FSB) {
+  # Обработка кнопок Включить и Выключить (включается уровень самого большего
+  # времени наработки) для ФСТЭК для старого варианта прошивки
+  #DEFINES += GNRWPC_POWER_ONOFF_FSTEC_OLD
+}
+
 QMAKE_TARGET_COMPANY = ООО \"\"РЭС\"\"
-QMAKE_TARGET_PRODUCT = Покров ПЭМИН
-QMAKE_TARGET_DESCRIPTION = Покров ПЭМИН
-QMAKE_TARGET_COPYRIGHT = ООО \"\"РЭС\"\"
+contains(DEFINES, GNRWPC_FSB) {
+  QMAKE_TARGET_PRODUCT = Покров
+} else {
+  QMAKE_TARGET_PRODUCT = Покров ПЭМИН
+}
+QMAKE_TARGET_DESCRIPTION = $${QMAKE_TARGET_PRODUCT}
+QMAKE_TARGET_COPYRIGHT = $${QMAKE_TARGET_COMPANY}
+
+PROGNAME_STR_1 = '\\"$${QMAKE_TARGET_PRODUCT}\\"'
+DEFINES += PROGNAME_STR=\"$${PROGNAME_STR_1}\"
 
 RC_ICONS = irs.ico
 

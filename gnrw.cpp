@@ -14,7 +14,9 @@ gnrw_t::gnrw_t():
   m_network_variables(),
   m_sync_timer(irs::make_cnt_s(2)),
   m_apply_ip_timer(irs::make_cnt_s(2)),
-  m_wait_apply_ip_timer(irs::make_cnt_s(2)),
+  m_wait_apply_ip_timer(irs::make_cnt_s(2))
+  #ifdef GNRWPC_POWER_ONOFF_FSTEC_OLD
+  ,
   m_power_index(1),
   m_wait_power_change_timer(irs::make_cnt_ms(500)),
   m_ether_power_on(m_power_max),
@@ -23,6 +25,7 @@ gnrw_t::gnrw_t():
   m_line_power_time_list(),
   m_is_on_power_finded(false),
   m_is_on_power_find_perform(false)
+  #endif //GNRWPC_POWER_ONOFF_FSTEC_OLD
 {
 }
 
@@ -45,17 +48,17 @@ bool gnrw_t::connected() const
 bool gnrw_t::get_boost() const
 {
   if (connected()) {
-    return m_network_variables.boost_bit;
+    return false; //m_network_variables.boost_bit;
   }
   return false;
 }
 
-void gnrw_t::set_boost(bool a_enable)
+void gnrw_t::set_boost(bool)
 {
   if (!connected()) {
      return;
   }
-  m_network_variables.boost_bit = a_enable;
+  //m_network_variables.boost_bit = a_enable;
   m_sync_timer.start();
 }
 
@@ -300,6 +303,7 @@ void gnrw_t::set_show_time_interval(size_t a_time)
 
 void gnrw_t::on(bool a_on)
 {
+  #ifdef GNRWPC_POWER_ONOFF_FSTEC_OLD
   if (!connected()) {
     return;
   }
@@ -314,6 +318,13 @@ void gnrw_t::on(bool a_on)
     m_network_variables.ether_power = 0;
     m_network_variables.line_power = 0;
   }
+  #else //GNRWPC_POWER_ONOFF_FSTEC_OLD
+  if (a_on) {
+    m_network_variables.on_bit = 1;
+  } else {
+    m_network_variables.on_bit = 0;
+  }
+  #endif //GNRWPC_POWER_ONOFF_FSTEC_OLD
 }
 
 bool gnrw_t::on()
@@ -321,7 +332,12 @@ bool gnrw_t::on()
   if (!connected()) {
     return false;
   }
+
+  #ifdef GNRWPC_POWER_ONOFF_FSTEC_OLD
   return (get_ether_power() > 0) || (get_line_power() > 0);
+  #else //GNRWPC_POWER_ONOFF_FSTEC_OLD
+  return m_network_variables.on_bit == 1;
+  #endif //GNRWPC_POWER_ONOFF_FSTEC_OLD
 }
 
 bool gnrw_t::ip_change_success_check()
@@ -332,13 +348,14 @@ bool gnrw_t::ip_change_success_check()
 void gnrw_t::reset()
 {
   //m_network_variables.boost_bit = 1;
-  //m_network_variables.ether_power = 9;
-  //m_network_variables.line_power = 9;
+  #ifdef GNRWPC_FSB
+  m_network_variables.ether_power = 9;
+  m_network_variables.line_power = 9;
+  m_network_variables.show_power_interval = 1;
+  m_network_variables.show_time_interval = 5;
+  #endif //GNRWPC_FSB
   m_network_variables.volume = 1;
-  //m_network_variables.show_power_interval = 1;
-  //m_network_variables.show_time_interval = 5;
   m_network_variables.bright = 2;
-
   m_sync_timer.start();
 }
 
@@ -348,6 +365,7 @@ bool gnrw_t::synchronizes()
   return !m_sync_timer.stopped();
 }
 
+#ifdef GNRWPC_POWER_ONOFF_FSTEC_OLD
 void gnrw_t::on_power_find_start()
 {
   m_is_on_power_find_perform = true;
@@ -416,10 +434,13 @@ void gnrw_t::on_power_find_tick()
     }
   }
 }
+#endif //GNRWPC_POWER_ONOFF_FSTEC_OLD
 
 void gnrw_t::tick()
 {
+  #ifdef GNRWPC_POWER_ONOFF_FSTEC_OLD
   on_power_find_tick();
+  #endif //GNRWPC_POWER_ONOFF_FSTEC_OLD
 
   if (m_apply_ip_timer.check()) {
     if (connected()) {
@@ -433,7 +454,11 @@ void gnrw_t::network_variables_t::connect(irs::mxdata_t* ap_data)
 {
   apply_ip_mask_bit.connect(ap_data, 0, 0);
   wdt_test_bit.connect(ap_data, 0, 1);
-  boost_bit.connect(ap_data, 0, 2);
+  //boost_bit.connect(ap_data, 0, 2);
+  on_bit.connect(ap_data, 0, 4);
+  fsb_bit.connect(ap_data, 0, 5);
+  fsb_auto_bit.connect(ap_data, 0, 6);
+
   fail_bit.connect(ap_data, 2, 0);
   work1_bit.connect(ap_data, 2, 1);
   work2_bit.connect(ap_data, 2, 2);

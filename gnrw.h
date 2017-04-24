@@ -7,7 +7,6 @@
 #include <irsmbus.h>
 #include <irsdevices.h>
 
-
 #include <irsfinal.h>
 
 struct modbus_settings_t
@@ -71,7 +70,7 @@ public:
   void connect(irs::mxdata_t* ap_data);
   bool connected() const;
   bool get_boost() const;
-  void set_boost(bool a_enable);
+  void set_boost(bool);
   bool get_error_status() const;
   bool get_detector_1_status() const;
   bool get_detector_2_status() const;
@@ -111,7 +110,10 @@ private:
     void connect(irs::mxdata_t* ap_data);
     irs::bit_data_t apply_ip_mask_bit;
     irs::bit_data_t wdt_test_bit;
-    irs::bit_data_t boost_bit;
+    //irs::bit_data_t boost_bit;
+    irs::bit_data_t on_bit;
+    irs::bit_data_t fsb_bit;
+    irs::bit_data_t fsb_auto_bit;
     irs::bit_data_t fail_bit;
     irs::bit_data_t work1_bit;
     irs::bit_data_t work2_bit;
@@ -151,6 +153,7 @@ private:
   irs::timer_t m_sync_timer;
   irs::timer_t m_apply_ip_timer;
   irs::timer_t m_wait_apply_ip_timer;
+  #ifdef GNRWPC_POWER_ONOFF_FSTEC_OLD
   size_t m_power_index;
   irs::timer_t m_wait_power_change_timer;
   size_t m_ether_power_on;
@@ -159,9 +162,12 @@ private:
   vector<irs_u32> m_line_power_time_list;
   bool m_is_on_power_finded;
   bool m_is_on_power_find_perform;
+  #endif //GNRWPC_POWER_ONOFF_FSTEC_OLD
 
+  #ifdef GNRWPC_POWER_ONOFF_FSTEC_OLD
   void on_power_find_start();
   void on_power_find_tick();
+  #endif //GNRWPC_POWER_ONOFF_FSTEC_OLD
 };
 
 class gnrw_link_t: public irs::mxdata_assembly_t

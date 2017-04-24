@@ -73,8 +73,10 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->showTimeIntervalHorizontalSlider, SIGNAL(valueChanged(int)),
     ui->showTimeIntervalSpinBox, SLOT(setValue(int)));
 
-  setWindowTitle(irs::str_conv<QString>(wstring(L"Покров ПЭМИН ")) +
-    irs::str_conv<QString>(std::string(VERSION_STR)));
+  setWindowTitle(QString::fromLocal8Bit(PROGNAME_STR) + " " +
+    QString::fromLocal8Bit(VERSION_STR));
+//  setWindowTitle(irs::str_conv<QString>(wstring(L"Покров ПЭМИН ")) +
+//    irs::str_conv<QString>(std::string(VERSION_STR)));
 
   irs::loc();
   setlocale(LC_ALL, "Russian_Russia.1251");
@@ -106,8 +108,11 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->detector4IconLabel->setAttribute(Qt::WA_NoSystemBackground);
   updateDetectorsStatus(true);
   //ui->statusIconLabel->setMovie(mp_movie);
+
   // Скрываем режим "Максимальная мощность"
   ui->boostCheckBox->setVisible(false);
+
+  #ifndef GNRWPC_FSB
   ui->label_2->setVisible(false);
   ui->etherPowerLevelSpinBox->setVisible(false);
   ui->etherPowerLevelHorizontalSlider->setVisible(false);
@@ -120,6 +125,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->showTimeIntervalLabel->setVisible(false);
   ui->showTimeIntervalSpinBox->setVisible(false);
   ui->showTimeIntervalHorizontalSlider->setVisible(false);
+  #endif //GNRWPC_FSB
 }
 
 MainWindow::~MainWindow()

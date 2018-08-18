@@ -11,6 +11,19 @@
 
 #include <irsfinal.h>
 
+namespace {
+
+  QString getProgName()
+  {
+    const char* prog_name = PROGNAME_STR;
+    const char* version = VERSION_STR;
+    const std::string s_utf_8 = irs::win_1251_to_utf_8(prog_name) + " " +
+      irs::win_1251_to_utf_8(version);
+    return irs::str_conv<QString>(s_utf_8);
+  }
+
+} // namespace
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow),
@@ -37,10 +50,10 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
 
   connect(ui->etherPowerLevelSpinBox, SIGNAL(valueChanged(int)),
-    this, SLOT(on_etherPowerLevelSpinBox_valueChangedUser(int)));
+    this, SLOT(onEtherPowerLevelSpinBox_valueChangedUser(int)));
 
   connect(ui->linePowerLevelSpinBox, SIGNAL(valueChanged(int)),
-    this, SLOT(on_linePowerLevelSpinBox_valueChangedUser(int)));
+    this, SLOT(onLinePowerLevelSpinBox_valueChangedUser(int)));
 
 
   connect(ui->etherPowerLevelSpinBox, SIGNAL(valueChanged(int)),
@@ -73,18 +86,12 @@ MainWindow::MainWindow(QWidget *parent) :
   connect(ui->showTimeIntervalHorizontalSlider, SIGNAL(valueChanged(int)),
     ui->showTimeIntervalSpinBox, SLOT(setValue(int)));
 
-  setWindowTitle(QString::fromLocal8Bit(PROGNAME_STR) + " " +
-    QString::fromLocal8Bit(VERSION_STR));
-//  setWindowTitle(irs::str_conv<QString>(wstring(L"Покров ПЭМИН ")) +
-//    irs::str_conv<QString>(std::string(VERSION_STR)));
+  setWindowTitle(getProgName());
 
   irs::loc();
-  setlocale(LC_ALL, "Russian_Russia.1251");
+  //setlocale(LC_ALL, "Russian_Russia.1251"); // Это нужно?
 
   m_timer.start(10);
-
-  this->setFixedSize(this->sizeHint());
-
 
   mp_settings->load();
 
@@ -126,6 +133,8 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->showTimeIntervalSpinBox->setVisible(false);
   ui->showTimeIntervalHorizontalSlider->setVisible(false);
   #endif //GNRWPC_FSB
+
+  this->setFixedSize(this->sizeHint());
 }
 
 MainWindow::~MainWindow()
@@ -329,24 +338,24 @@ void MainWindow::updateManagement()
         if (ui->etherPowerLevelSpinBox->value() != ether_power) {
           // Отключаем слот перед изменением значения, затем опять подключаем
           disconnect(ui->etherPowerLevelSpinBox, SIGNAL(valueChanged(int)),
-            this, SLOT(on_etherPowerLevelSpinBox_valueChangedUser(int)));
+            this, SLOT(onEtherPowerLevelSpinBox_valueChangedUser(int)));
 
           ui->etherPowerLevelSpinBox->setValue(ether_power);
 
           connect(ui->etherPowerLevelSpinBox, SIGNAL(valueChanged(int)),
-            this, SLOT(on_etherPowerLevelSpinBox_valueChangedUser(int)));
+            this, SLOT(onEtherPowerLevelSpinBox_valueChangedUser(int)));
         }
 
         const int line_power = static_cast<int>(m_gnrw.get_line_power());
         if (ui->linePowerLevelSpinBox->value() != line_power) {
           // Отключаем слот перед изменением значения, затем опять подключаем
           disconnect(ui->linePowerLevelSpinBox, SIGNAL(valueChanged(int)),
-            this, SLOT(on_linePowerLevelSpinBox_valueChangedUser(int)));
+            this, SLOT(onLinePowerLevelSpinBox_valueChangedUser(int)));
 
           ui->linePowerLevelSpinBox->setValue(line_power);
 
           connect(ui->linePowerLevelSpinBox, SIGNAL(valueChanged(int)),
-            this, SLOT(on_linePowerLevelSpinBox_valueChangedUser(int)));
+            this, SLOT(onLinePowerLevelSpinBox_valueChangedUser(int)));
         }
       }
 
@@ -443,7 +452,7 @@ QString MainWindow::timeToStr(double a_t, bool a_show_seconds)
   return text;
 }
 
-void MainWindow::on_etherPowerLevelSpinBox_valueChangedUser(int arg1)
+void MainWindow::onEtherPowerLevelSpinBox_valueChangedUser(int arg1)
 {
   // Этот слот должен вызываться только при изменении значения пользователем
 
@@ -462,7 +471,7 @@ void MainWindow::on_etherPowerLevelSpinBox_valueChanged(int arg1)
 {
 }
 
-void MainWindow::on_linePowerLevelSpinBox_valueChangedUser(int arg1)
+void MainWindow::onLinePowerLevelSpinBox_valueChangedUser(int arg1)
 {
   // Этот слот должен вызываться только при изменении значения пользователем
 

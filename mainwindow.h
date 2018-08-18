@@ -28,8 +28,8 @@ public:
 private slots:
   void tick();
 
-  void on_etherPowerLevelSpinBox_valueChangedUser(int arg1);
-  void on_linePowerLevelSpinBox_valueChangedUser(int arg1);
+  void onEtherPowerLevelSpinBox_valueChangedUser(int arg1);
+  void onLinePowerLevelSpinBox_valueChangedUser(int arg1);
 
   void on_etherPowerLevelSpinBox_valueChanged(int arg1);
 

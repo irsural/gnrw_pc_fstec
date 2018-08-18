@@ -45,7 +45,7 @@ INCLUDEPATH += ../mxsrclib/arch/qt/
 
 
 
-win32-g++ |linux-g++{
+win32-g++ | linux-g++ | linux-g++-64 {
   QMAKE_CXXFLAGS += -finput-charset=CP1251
   QMAKE_CXXFLAGS += -fno-strict-aliasing
   QMAKE_CXXFLAGS += -Wno-deprecated

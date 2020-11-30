@@ -31,10 +31,6 @@ private slots:
   void on_etherPowerLevelSpinBox_valueChangedUser(int arg1);
   void on_linePowerLevelSpinBox_valueChangedUser(int arg1);
 
-  void on_etherPowerLevelSpinBox_valueChanged(int arg1);
-
-  void on_linePowerLevelSpinBox_valueChanged(int arg1);
-
   void on_settingsAction_triggered();
 
   void on_setDeviceIPAction_triggered();
@@ -54,6 +50,8 @@ private slots:
   void on_onPushButton_clicked();
 
   void on_offPushButton_clicked();
+
+  void on_detect_devices_action_triggered();
 
 private:
   QString timeToStr(double a_t, bool a_show_seconds = false);

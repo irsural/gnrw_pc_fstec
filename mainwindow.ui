@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>841</width>
-    <height>707</height>
+    <height>719</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -760,6 +760,11 @@
   <action name="setDeviceIPAction">
    <property name="text">
     <string>Изменить адрес на устройстве</string>
+   </property>
+  </action>
+  <action name="detect_devices_action">
+   <property name="text">
+    <string>Обнаружить устройства</string>
    </property>
   </action>
  </widget>

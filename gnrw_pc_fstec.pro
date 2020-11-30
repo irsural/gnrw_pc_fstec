@@ -6,7 +6,7 @@
 
 DEFINES += IRS_LIB_IRSMBUS_DEBUG_TYPE=IRS_LIB_DEBUG_NONE
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -62,6 +62,7 @@ win32:LIBS += -lws2_32
 
 
 SOURCES += main.cpp\
+    detect_devices_dialog.cpp \
         mainwindow.cpp \
     ../mxsrclib/correct_alg.cpp \
     ../mxsrclib/csvwork.cpp \
@@ -211,12 +212,14 @@ HEADERS  += mainwindow.h \
     ../mxsrclib/arch/qt/mxifal.h \
     ../mxsrclib/arch/qt/mxnetda.h \
     ../mxsrclib/arch/qt/ni488.h \
+    detect_devices_dialog.h \
     settings.h \
     settingsdialog.h \
     setdeviceipdialog.h \
     gnrw.h
 
 FORMS    += mainwindow.ui \
+    detect_devices_dialog.ui \
     settingsdialog.ui \
     setdeviceipdialog.ui
 

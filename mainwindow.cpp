@@ -8,8 +8,11 @@
 #include <irslocale.h>
 
 #include "settingsdialog.h"
+#include "detect_devices_dialog.h"
 
 #include <irsfinal.h>
+
+#define TMP_DETECT_DEVICES_ENABLE
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -126,6 +129,10 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->showTimeIntervalSpinBox->setVisible(false);
   ui->showTimeIntervalHorizontalSlider->setVisible(false);
   #endif //GNRWPC_FSB
+
+  #ifdef TMP_DETECT_DEVICES_ENABLE
+  ui->menu->addAction(ui->detect_devices_action);
+  #endif
 }
 
 MainWindow::~MainWindow()
@@ -458,10 +465,6 @@ void MainWindow::on_etherPowerLevelSpinBox_valueChangedUser(int arg1)
   }
 }
 
-void MainWindow::on_etherPowerLevelSpinBox_valueChanged(int arg1)
-{
-}
-
 void MainWindow::on_linePowerLevelSpinBox_valueChangedUser(int arg1)
 {
   // Этот слот должен вызываться только при изменении значения пользователем
@@ -475,11 +478,6 @@ void MainWindow::on_linePowerLevelSpinBox_valueChangedUser(int arg1)
   } else {
     m_gnrw.set_line_power(arg1);
   }
-}
-
-void MainWindow::on_linePowerLevelSpinBox_valueChanged(int arg1)
-{
-
 }
 
 void MainWindow::on_settingsAction_triggered()
@@ -588,4 +586,18 @@ void MainWindow::on_offPushButton_clicked()
   m_gnrw.on(false);
   ui->onPushButton->setChecked(false);
   ui->offPushButton->setChecked(true);
+}
+
+void MainWindow::on_detect_devices_action_triggered()
+{
+  detect_devices_dialog dialog(this, mp_settings);
+  const int res = dialog.exec();
+  if (res == QDialog::Accepted) {
+    if (m_gnrw_link.get_settings() != mp_settings->gnrw_settings) {
+      m_gnrw_link.enabled(false);
+      m_gnrw_link.set_settings(mp_settings->gnrw_settings);
+      m_gnrw_link.enabled(true);
+    }
+    mp_settings->save();
+  }
 }

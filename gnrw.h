@@ -87,7 +87,8 @@ public:
   size_t get_line_power() const;
   void set_line_power(size_t a_level);
   void get_network_address(string_type* ap_ip, string_type* ap_mask);
-  bool set_network_address(const string_type& a_ip, const string_type& a_mask);
+  bool set_network_address(const string_type& a_ip, const string_type& a_mask,
+    bool a_dhcp_enable);
   size_t get_volume() const;
   void set_volume(size_t a_level);
   size_t get_brightness() const;
@@ -114,6 +115,7 @@ private:
     irs::bit_data_t on_bit;
     irs::bit_data_t fsb_bit;
     irs::bit_data_t fsb_auto_bit;
+    irs::bit_data_t dhcp_bit;
     irs::bit_data_t fail_bit;
     irs::bit_data_t work1_bit;
     irs::bit_data_t work2_bit;

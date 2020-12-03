@@ -10,7 +10,7 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-VERSION = 1.5
+VERSION = 1.6
 VERSTR = '\\"$${VERSION}\\"'
 DEFINES += VERSION_STR=\"$${VERSTR}\"
 

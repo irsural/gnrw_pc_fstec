@@ -504,8 +504,9 @@ void MainWindow::on_setDeviceIPAction_triggered()
   dialog.setAddress(address);
   if (dialog.exec() == QDialog::Accepted) {
     address = dialog.getAddress();
-    if (!m_gnrw.set_network_address(address.ip, address.mask)) {
+    bool dhcp_enabled = dialog.connectToDeviceWithNewAddress();
 
+    if (!m_gnrw.set_network_address(address.ip, address.mask, dhcp_enabled)) {
       QMessageBox msgBox;
       msgBox.setWindowTitle(irs::str_conv<QString>(std::wstring(L"Покров")));
       QString text = irs::str_conv<QString>(
@@ -523,8 +524,7 @@ void MainWindow::on_setDeviceIPAction_triggered()
       return;
     }
 
-    m_connect_to_device_with_new_address =
-      dialog.connectToDeviceWithNewAddress();
+    m_connect_to_device_with_new_address = !dhcp_enabled;
     m_new_address = address;
   }
 }

@@ -205,7 +205,7 @@ void gnrw_t::get_network_address(string_type* ap_ip, string_type* ap_mask)
 }
 
 bool gnrw_t::set_network_address(const string_type& a_ip,
-  const string_type& a_mask)
+  const string_type& a_mask, bool a_dhcp_enable)
 {
   mxip_t ip;
   if (!str_to_mxip(a_ip, &ip)) {
@@ -227,6 +227,8 @@ bool gnrw_t::set_network_address(const string_type& a_ip,
   m_network_variables.mask2 = mask.val[1];
   m_network_variables.mask3 = mask.val[2];
   m_network_variables.mask4 = mask.val[3];
+
+  m_network_variables.dhcp_bit = a_dhcp_enable;
 
   m_apply_ip_timer.start();
 
@@ -458,6 +460,7 @@ void gnrw_t::network_variables_t::connect(irs::mxdata_t* ap_data)
   on_bit.connect(ap_data, 0, 4);
   fsb_bit.connect(ap_data, 0, 5);
   fsb_auto_bit.connect(ap_data, 0, 6);
+  dhcp_bit.connect(ap_data, 0, 7);
 
   fail_bit.connect(ap_data, 2, 0);
   work1_bit.connect(ap_data, 2, 1);

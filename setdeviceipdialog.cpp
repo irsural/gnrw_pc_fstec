@@ -35,7 +35,7 @@ void SetDeviceIPDialog::setAddress(const address_t& a_address)
 
 bool SetDeviceIPDialog::connectToDeviceWithNewAddress() const
 {
-  return ui->connectToDeviceWithNewAddressCheckBox->isChecked();
+  return ui->dhcp_enable_checkbox->isChecked();
 }
 
 void SetDeviceIPDialog::on_okPushButton_clicked()

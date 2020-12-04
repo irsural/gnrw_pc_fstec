@@ -38,7 +38,7 @@ public:
 
   address_t getAddress() const;
   void setAddress(const address_t& a_address);
-  bool connectToDeviceWithNewAddress() const;
+  bool is_dhcp_enabled() const;
 private slots:
   void on_okPushButton_clicked();
 

@@ -10,15 +10,30 @@ detect_devices_dialog::detect_devices_dialog(QWidget *parent, settings_t *ap_set
   QDialog(parent),
   ui(new Ui::detect_devices_dialog),
   mp_settings(ap_settings),
-  m_send_broadcast_socket(this),
-  m_recv_ip_socket(this),
+  m_sockets(),
   m_answer_address(),
   m_answer_port(0)
 {
   ui->setupUi(this);
 
   connect(ui->cancel_button, &QAbstractButton::clicked, this, &detect_devices_dialog::reject);
-  connect(&m_recv_ip_socket, &QUdpSocket::readyRead, this, &detect_devices_dialog::read_ip_from_socket);
+
+  const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
+  for (auto& interface_: QNetworkInterface::allInterfaces()) {
+    for (QNetworkAddressEntry &address : interface_.addressEntries()) {
+      if (address.ip().protocol() == QAbstractSocket::IPv4Protocol && !address.netmask().isNull() &&
+          address.ip() != localhost)
+      {
+        QHostAddress bcast = QHostAddress(address.ip().toIPv4Address() | ~address.netmask().toIPv4Address());
+
+        auto socket = std::make_shared<QUdpSocket>(new QUdpSocket(this));
+        socket->bind(address.ip());
+
+        m_sockets[bcast.toString()] = socket;
+        connect(socket.get(), &QUdpSocket::readyRead, this, &detect_devices_dialog::read_ip_from_socket);
+      }
+    }
+  }
 
   on_detect_devices_button_clicked();
 }
@@ -30,17 +45,19 @@ detect_devices_dialog::~detect_devices_dialog()
 
 void detect_devices_dialog::read_ip_from_socket()
 {
-  while (m_recv_ip_socket.hasPendingDatagrams()) {
-    QNetworkDatagram datagram = m_recv_ip_socket.receiveDatagram();
+  for (auto& [_, socket]: m_sockets) {
+    while (socket->hasPendingDatagrams()) {
+      QNetworkDatagram datagram = socket->receiveDatagram();
 
-    QString data = QString::fromStdString(datagram.data().toStdString());
-    QStringList factory_ip = data.split(';');
+      QString data = QString::fromStdString(datagram.data().toStdString());
+      QStringList factory_ip = data.split(';');
 
-    if (factory_ip.size() == static_cast<size_t>(recv_data_order_t::count)) {
-      QHostAddress device_ip(factory_ip[static_cast<size_t>(recv_data_order_t::ip)]);
-      if (QAbstractSocket::IPv4Protocol == device_ip.protocol()) {
-        QString factory_number = factory_ip[static_cast<size_t>(recv_data_order_t::factory_number)];
-        append_ip_to_table(factory_number, device_ip);
+      if (factory_ip.size() == static_cast<size_t>(recv_data_order_t::count)) {
+        QHostAddress device_ip(factory_ip[static_cast<size_t>(recv_data_order_t::ip)]);
+        if (QAbstractSocket::IPv4Protocol == device_ip.protocol()) {
+          QString factory_number = factory_ip[static_cast<size_t>(recv_data_order_t::factory_number)];
+          append_ip_to_table(factory_number, device_ip);
+        }
       }
     }
   }
@@ -79,14 +96,8 @@ void detect_devices_dialog::on_detect_devices_button_clicked()
 {
   ui->devices_table->setRowCount(0);
 
-  m_send_broadcast_socket.writeDatagram(m_ip_request_str, QHostAddress(m_subnet_broadcast_address), m_broadcast_port);
-  // ѕо каким то причинам m_send_broadcast_socket.localPort() (возвращает QHostAddress::Any) не работает
-  m_answer_address = QHostAddress::AnyIPv4;
-  m_answer_port = m_send_broadcast_socket.localPort();
-
-  if (m_answer_port && m_answer_address.toString() != "") {
-    m_recv_ip_socket.abort();
-    m_recv_ip_socket.bind(m_answer_address, m_answer_port);
+  for (auto& [addr, socket]: m_sockets) {
+    socket->writeDatagram(m_ip_request_str, QHostAddress(addr), m_broadcast_port);
   }
 }
 

@@ -504,7 +504,7 @@ void MainWindow::on_setDeviceIPAction_triggered()
   dialog.setAddress(address);
   if (dialog.exec() == QDialog::Accepted) {
     address = dialog.getAddress();
-    bool dhcp_enabled = dialog.connectToDeviceWithNewAddress();
+    bool dhcp_enabled = dialog.is_dhcp_enabled();
 
     if (!m_gnrw.set_network_address(address.ip, address.mask, dhcp_enabled)) {
       QMessageBox msgBox;

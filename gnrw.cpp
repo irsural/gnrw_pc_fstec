@@ -231,8 +231,14 @@ bool gnrw_t::set_network_address(const string_type& a_ip,
   m_network_variables.dhcp_bit = a_dhcp_enable;
 
   m_apply_ip_timer.start();
+  m_wait_apply_ip_timer.stop();
 
   return true;
+}
+
+bool gnrw_t::is_dhcp_enable()
+{
+  return m_network_variables.dhcp_bit;
 }
 
 size_t gnrw_t::get_volume() const

@@ -33,7 +33,7 @@ void SetDeviceIPDialog::setAddress(const address_t& a_address)
   ui->maskLineEdit->setText(irs::str_conv<QString>(a_address.mask));
 }
 
-bool SetDeviceIPDialog::connectToDeviceWithNewAddress() const
+bool SetDeviceIPDialog::is_dhcp_enabled() const
 {
   return ui->dhcp_enable_checkbox->isChecked();
 }

@@ -99,6 +99,7 @@ public:
   void set_show_time_interval(size_t a_time);
   void on(bool a_on);
   bool on();
+  bool is_dhcp_enable();
 
   bool ip_change_success_check();
   //generator_status_t get_status();

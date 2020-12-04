@@ -8,6 +8,8 @@ DEFINES += IRS_LIB_IRSMBUS_DEBUG_TYPE=IRS_LIB_DEBUG_NONE
 
 QT       += core gui network
 
+CONFIG += c++11
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 VERSION = 1.6

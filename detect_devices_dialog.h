@@ -42,15 +42,12 @@ private:
   static constexpr const char* m_ip_request_str = "pokrov_get_ip";
   static constexpr size_t m_broadcast_port = 5007;
 
-  static constexpr const char* m_subnet_broadcast_address = "192.168.3.255";
   static constexpr const char* m_zero_network_broadcast_address = "255.255.255.255";
 
   Ui::detect_devices_dialog *ui;
-
   settings_t* mp_settings;
 
-  QUdpSocket m_send_broadcast_socket;
-  QUdpSocket m_recv_ip_socket;
+  std::map<QString, std::shared_ptr<QUdpSocket>> m_sockets;
 
   QHostAddress m_answer_address;
   uint16_t m_answer_port;

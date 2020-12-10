@@ -45,9 +45,10 @@ detect_devices_dialog::~detect_devices_dialog()
 
 void detect_devices_dialog::read_ip_from_socket()
 {
-  for (auto& [_, socket]: m_sockets) {
-    while (socket->hasPendingDatagrams()) {
-      QNetworkDatagram datagram = socket->receiveDatagram();
+  std::map<QString, std::shared_ptr<QUdpSocket>>::iterator it;
+  for (it = m_sockets.begin(); it != m_sockets.end(); ++it) {
+    while (it->second->hasPendingDatagrams()) {
+      QNetworkDatagram datagram = it->second->receiveDatagram();
 
       QString data = QString::fromStdString(datagram.data().toStdString());
       QStringList factory_ip = data.split(';');
@@ -86,7 +87,7 @@ bool detect_devices_dialog::set_selected_ip()
     mp_settings->gnrw_settings.ip = irs::str_conv<irs::string_t>(ip_str);
     return true;
   } else {
-    QMessageBox::warning(this, tr("Ошибка"), tr("IP-адрес не выбран"),
+    QMessageBox::warning(this, tr("Ћшибка"), tr("IP-адрес не выбран"),
       QMessageBox::Ok, QMessageBox::Ok);
     return false;
   }
@@ -96,8 +97,9 @@ void detect_devices_dialog::on_detect_devices_button_clicked()
 {
   ui->devices_table->setRowCount(0);
 
-  for (auto& [addr, socket]: m_sockets) {
-    socket->writeDatagram(m_ip_request_str, QHostAddress(addr), m_broadcast_port);
+  std::map<QString, std::shared_ptr<QUdpSocket>>::iterator it;
+  for (it = m_sockets.begin(); it != m_sockets.end(); ++it) {
+    it->second->writeDatagram(m_ip_request_str, QHostAddress(it->first), m_broadcast_port);
   }
 }
 

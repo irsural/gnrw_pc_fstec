@@ -65,6 +65,7 @@ win32:LIBS += -lws2_32
 
 SOURCES += main.cpp\
     detect_devices_dialog.cpp \
+    gnrw_scanner.cpp \
         mainwindow.cpp \
     ../mxsrclib/correct_alg.cpp \
     ../mxsrclib/csvwork.cpp \
@@ -215,6 +216,7 @@ HEADERS  += mainwindow.h \
     ../mxsrclib/arch/qt/mxnetda.h \
     ../mxsrclib/arch/qt/ni488.h \
     detect_devices_dialog.h \
+    gnrw_scanner.h \
     settings.h \
     settingsdialog.h \
     setdeviceipdialog.h \

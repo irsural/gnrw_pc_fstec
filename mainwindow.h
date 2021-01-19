@@ -11,6 +11,7 @@
 #include "setdeviceipdialog.h"
 #include "settings.h"
 #include "gnrw.h"
+#include "gnrw_scanner.h"
 
 #include <irsfinal.h>
 
@@ -30,29 +31,19 @@ private slots:
 
   void on_etherPowerLevelSpinBox_valueChangedUser(int arg1);
   void on_linePowerLevelSpinBox_valueChangedUser(int arg1);
-
   void on_settingsAction_triggered();
-
   void on_setDeviceIPAction_triggered();
-
   void on_volumeSpinBox_valueChanged(int arg1);
-
   void on_showPowerIntervalSpinBox_valueChanged(int arg1);
-
   void on_showTimeIntervalSpinBox_valueChanged(int arg1);
-
   void on_resetPushButton_clicked();
-
   void on_brightnessSpinBox_valueChanged(int arg1);
-
   void on_boostCheckBox_clicked(bool checked);
-
   void on_onPushButton_clicked();
-
   void on_offPushButton_clicked();
-
   void on_detect_devices_action_triggered();
 
+  void new_gnrw_found(const QString &a_factory_number, const QHostAddress& a_ip);
 private:
   QString timeToStr(double a_t, bool a_show_seconds = false);
   void updateStatus(bool a_force = false);
@@ -91,7 +82,16 @@ private:
   QMovie* mp_movie;
   bool m_connect_to_device_with_new_address;
   bool m_set_power_after_boost_reset;
-  address_t m_new_address;
+
+  gnrw_scanner_t m_gnrw_scanner;
+
+  uint32_t m_target_factory_number;
+  irs::timer_t m_find_gnrw_timer;
+
+  static constexpr uint32_t m_find_gnrw_try_count = 3;
+  uint32_t m_current_find_gnrw_try;
+
+  bool m_target_gnrw_found;
 };
 
 #endif // MAINWINDOW_H

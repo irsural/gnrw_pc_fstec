@@ -34,7 +34,11 @@ MainWindow::MainWindow(QWidget *parent) :
   mp_movie(),
   m_connect_to_device_with_new_address(false),
   m_set_power_after_boost_reset(false),
-  m_new_address()
+  m_gnrw_scanner(),
+  m_target_factory_number(0),
+  m_find_gnrw_timer(irs::make_cnt_ms(1000)),
+  m_current_find_gnrw_try(0),
+  m_target_gnrw_found(false)
 {
   ui->setupUi(this);
 
@@ -79,8 +83,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
   setWindowTitle(QString::fromLocal8Bit(PROGNAME_STR) + " " +
     QString::fromLocal8Bit(VERSION_STR));
-//  setWindowTitle(irs::str_conv<QString>(wstring(L"Покров ПЭМИН ")) +
-//    irs::str_conv<QString>(std::string(VERSION_STR)));
 
   irs::loc();
   setlocale(LC_ALL, "Russian_Russia.1251");
@@ -88,7 +90,6 @@ MainWindow::MainWindow(QWidget *parent) :
   m_timer.start(10);
 
   this->setFixedSize(this->sizeHint());
-
 
   mp_settings->load();
 
@@ -111,7 +112,6 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->detector3IconLabel->setAttribute(Qt::WA_NoSystemBackground);
   ui->detector4IconLabel->setAttribute(Qt::WA_NoSystemBackground);
   updateDetectorsStatus(true);
-  //ui->statusIconLabel->setMovie(mp_movie);
 
   // Скрываем режим "Максимальная мощность"
   ui->boostCheckBox->setVisible(false);
@@ -160,33 +160,39 @@ void MainWindow::tick()
 
   if (m_update_timer.check()) {
     updateStatus();
-
     updateDetectorsStatus();
 
     ui->setDeviceIPAction->setEnabled(m_gnrw.connected());
 
     updateId();
-
     updateManagement();
-
     updateTotalWorkTimeLabels();
-
     updateWorkTimes();
   }
 
-
-  /*if (dialog.connectToDeviceWithNewAddress()) {
-
-  }*/
   if (m_connect_to_device_with_new_address) {
     if (m_gnrw.ip_change_success_check()) {
+      connect(&m_gnrw_scanner, &gnrw_scanner_t::new_gnrw_found, this, &MainWindow::new_gnrw_found);
+
+      m_current_find_gnrw_try = 0;
+      m_target_gnrw_found = false;
+      m_gnrw_scanner.scan();
+      m_find_gnrw_timer.start();
+    }
+
+    if (m_target_gnrw_found) {
       m_connect_to_device_with_new_address = false;
-      mp_settings->gnrw_settings.ip = m_new_address.ip;
-      // Переподключение
-      m_gnrw_link.enabled(false);
-      m_gnrw_link.set_settings(mp_settings->gnrw_settings);
-      m_gnrw_link.enabled(true);
-      mp_settings->save();
+
+    } else if (m_find_gnrw_timer.check()) {
+      m_current_find_gnrw_try++;
+
+      if (m_current_find_gnrw_try < m_find_gnrw_try_count) {
+        m_gnrw_scanner.scan();
+        m_find_gnrw_timer.start();
+      } else {
+        m_connect_to_device_with_new_address = false;
+        disconnect(&m_gnrw_scanner, &gnrw_scanner_t::new_gnrw_found, this, &MainWindow::new_gnrw_found);
+      }
     }
   }
 }
@@ -506,8 +512,13 @@ void MainWindow::on_setDeviceIPAction_triggered()
   if (dialog.exec() == QDialog::Accepted) {
     address = dialog.getAddress();
     bool dhcp_enabled = dialog.is_dhcp_enabled();
+    m_target_factory_number = m_gnrw.get_id();
 
-    if (!m_gnrw.set_network_address(address.ip, address.mask, dhcp_enabled)) {
+    if (m_gnrw.set_network_address(address.ip, address.mask, dhcp_enabled)) {
+      m_connect_to_device_with_new_address = true;
+      m_target_gnrw_found = false;
+      m_find_gnrw_timer.stop();
+    } else {
       QMessageBox msgBox;
       msgBox.setWindowTitle(irs::str_conv<QString>(std::wstring(L"Покров")));
       QString text = irs::str_conv<QString>(
@@ -520,13 +531,23 @@ void MainWindow::on_setDeviceIPAction_triggered()
       QFont fond = msgBox.font();
       fond.setPointSize(font().pointSize());
       msgBox.setFont(fond);
-
       msgBox.exec();
-      return;
     }
+  }
+}
 
-    m_connect_to_device_with_new_address = !dhcp_enabled;
-    m_new_address = address;
+void MainWindow::new_gnrw_found(const QString &a_factory_number, const QHostAddress& a_ip)
+{
+  if (a_factory_number.toUInt() == m_target_factory_number) {
+    mp_settings->gnrw_settings.ip = irs::str_conv<settings_t::string_type>(a_ip.toString());
+    // Переподключение
+    m_gnrw_link.enabled(false);
+    m_gnrw_link.set_settings(mp_settings->gnrw_settings);
+    m_gnrw_link.enabled(true);
+    mp_settings->save();
+
+    m_target_gnrw_found = true;
+    disconnect(&m_gnrw_scanner, &gnrw_scanner_t::new_gnrw_found, this, &MainWindow::new_gnrw_found);
   }
 }
 
@@ -591,7 +612,7 @@ void MainWindow::on_offPushButton_clicked()
 
 void MainWindow::on_detect_devices_action_triggered()
 {
-  detect_devices_dialog dialog(this, mp_settings);
+  detect_devices_dialog dialog(this, mp_settings, &m_gnrw_scanner);
   const int res = dialog.exec();
   if (res == QDialog::Accepted) {
     if (m_gnrw_link.get_settings() != mp_settings->gnrw_settings) {

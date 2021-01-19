@@ -1,67 +1,25 @@
 #include "detect_devices_dialog.h"
 #include "ui_detect_devices_dialog.h"
 
-#include <QNetworkInterface>
-#include <QNetworkDatagram>
 #include <QMessageBox>
 
 
-detect_devices_dialog::detect_devices_dialog(QWidget *parent, settings_t *ap_settings) :
+detect_devices_dialog::detect_devices_dialog(QWidget *parent, settings_t *ap_settings, gnrw_scanner_t* ap_gnrw_scanner) :
   QDialog(parent),
   ui(new Ui::detect_devices_dialog),
   mp_settings(ap_settings),
-  m_sockets(),
-  m_answer_address(),
-  m_answer_port(0)
+  mp_gnrw_scanner(ap_gnrw_scanner)
 {
   ui->setupUi(this);
 
   connect(ui->cancel_button, &QAbstractButton::clicked, this, &detect_devices_dialog::reject);
-
-  const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
-  for (auto& interface_: QNetworkInterface::allInterfaces()) {
-    for (QNetworkAddressEntry &address : interface_.addressEntries()) {
-      if (address.ip().protocol() == QAbstractSocket::IPv4Protocol && !address.netmask().isNull() &&
-          address.ip() != localhost)
-      {
-        QHostAddress bcast = QHostAddress(address.ip().toIPv4Address() | ~address.netmask().toIPv4Address());
-
-        auto socket = std::make_shared<QUdpSocket>(new QUdpSocket(this));
-        socket->bind(address.ip());
-
-        m_sockets[bcast.toString()] = socket;
-        connect(socket.get(), &QUdpSocket::readyRead, this, &detect_devices_dialog::read_ip_from_socket);
-      }
-    }
-  }
-
+  connect(mp_gnrw_scanner, &gnrw_scanner_t::new_gnrw_found, this, &detect_devices_dialog::append_ip_to_table);
   on_detect_devices_button_clicked();
 }
 
 detect_devices_dialog::~detect_devices_dialog()
 {
   delete ui;
-}
-
-void detect_devices_dialog::read_ip_from_socket()
-{
-  std::map<QString, std::shared_ptr<QUdpSocket>>::iterator it;
-  for (it = m_sockets.begin(); it != m_sockets.end(); ++it) {
-    while (it->second->hasPendingDatagrams()) {
-      QNetworkDatagram datagram = it->second->receiveDatagram();
-
-      QString data = QString::fromStdString(datagram.data().toStdString());
-      QStringList factory_ip = data.split(';');
-
-      if (factory_ip.size() == static_cast<size_t>(recv_data_order_t::count)) {
-        QHostAddress device_ip(factory_ip[static_cast<size_t>(recv_data_order_t::ip)]);
-        if (QAbstractSocket::IPv4Protocol == device_ip.protocol()) {
-          QString factory_number = factory_ip[static_cast<size_t>(recv_data_order_t::factory_number)];
-          append_ip_to_table(factory_number, device_ip);
-        }
-      }
-    }
-  }
 }
 
 void detect_devices_dialog::append_ip_to_table(const QString& factory_number, const QHostAddress& a_ip)
@@ -87,7 +45,7 @@ bool detect_devices_dialog::set_selected_ip()
     mp_settings->gnrw_settings.ip = irs::str_conv<irs::string_t>(ip_str);
     return true;
   } else {
-    QMessageBox::warning(this, tr("Ћшибка"), tr("IP-адрес не выбран"),
+    QMessageBox::warning(this, tr("Ошибка"), tr("IP-адрес не выбран"),
       QMessageBox::Ok, QMessageBox::Ok);
     return false;
   }
@@ -96,11 +54,7 @@ bool detect_devices_dialog::set_selected_ip()
 void detect_devices_dialog::on_detect_devices_button_clicked()
 {
   ui->devices_table->setRowCount(0);
-
-  std::map<QString, std::shared_ptr<QUdpSocket>>::iterator it;
-  for (it = m_sockets.begin(); it != m_sockets.end(); ++it) {
-    it->second->writeDatagram(m_ip_request_str, QHostAddress(it->first), m_broadcast_port);
-  }
+  mp_gnrw_scanner->scan();
 }
 
 void detect_devices_dialog::on_connect_button_clicked()

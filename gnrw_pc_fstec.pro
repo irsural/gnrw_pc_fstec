@@ -16,7 +16,7 @@ VERSION = 1.6
 VERSTR = '\\"$${VERSION}\\"'
 DEFINES += VERSION_STR=\"$${VERSTR}\"
 
-DEFINES += GNRWPC_FSB
+#DEFINES += GNRWPC_FSB
 
 !contains(DEFINES, GNRWPC_FSB) {
   # Обработка кнопок Включить и Выключить (включается уровень самого большего

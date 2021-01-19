@@ -2,6 +2,7 @@
 #define GNRW_SCANNER_T_H
 
 #include <QUdpSocket>
+#include <memory>
 
 class gnrw_scanner_t : public QObject
 {

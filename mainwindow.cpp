@@ -14,6 +14,7 @@
 
 #define TMP_DETECT_DEVICES_ENABLE
 
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow),

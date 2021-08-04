@@ -126,6 +126,13 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->showTimeIntervalSpinBox->setVisible(false);
   ui->showTimeIntervalHorizontalSlider->setVisible(false);
   #endif //GNRWPC_FSB
+
+  // Проверка системы basic_mlog
+  cout << "cout test" << endl;
+  irs::mlog().rdbuf(cout.rdbuf());
+  irs::mlog() << "mlog test" << endl;
+  irs::wmlog().rdbuf(wcout.rdbuf());
+  irs::wmlog() << L"wide mlog test Русский" << endl;
 }
 
 MainWindow::~MainWindow()
